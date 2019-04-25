@@ -3,7 +3,7 @@ import math
 import Species
 import retro
 
-
+'''Population tracks the set of genomes which are currently being trained'''
 class Population:
     def __init__(self, size):
         self.pop = []
@@ -24,6 +24,8 @@ class Population:
             self.pop[i].brain.generate_network()
             self.pop[i].brain.mutate(self.innovation_history)
 
+    '''Calls the act method in all genomes of the population, also returns
+    the most fit genome of the population'''
     def update_alive(self):
         champion = self.pop[0]
         for i in range(len(self.pop)):
@@ -35,6 +37,7 @@ class Population:
                     champion = self.pop[i]
         return champion
 
+    '''Tracks if a player in the population has failed'''
     def done(self):
         for i in range(len(self.pop)):
             if not self.pop[i].dead:
@@ -50,6 +53,7 @@ class Population:
             self.best_score = temp_best.score
             self.best_player = temp_best.clone_for_replay()
 
+    '''Divides a population into species'''
     def speciate(self):
         for s in self.species:
             s.players.clear()
@@ -64,6 +68,7 @@ class Population:
             if not species_found:
                 self.species.append(Species.Species(self.pop[i]))
 
+    '''Calls the calculate_fitness method in all members of the population'''
     def calculate_fitness(self):
         for i in range(len(self.pop)):
             self.pop[i].calculate_fitness()
@@ -85,6 +90,7 @@ class Population:
             i -= 1
         self.species = temp.copy()
 
+    '''Eliminates species who have surpased the staleness threshold'''
     def kill_stale_species(self):
         for i in range(2, len(self.species)):
             if self.species[i].staleness >= 15:
@@ -97,6 +103,7 @@ class Population:
             average_sum += s.average_fitness
         return average_sum
 
+    '''Eliminated underperforming species'''
     def kill_bad_species(self):
         average_sum = self.get_average_fitness_sum()
         if average_sum == 0:
@@ -106,17 +113,20 @@ class Population:
                 self.species.remove(self.species[i])
                 i -= 1
 
+    '''Unused'''
     def cull_species(self):
         for s in self.species:
             s.cull()
             s.fitness_sharing()
             s.set_average()
 
+    '''Unused'''
     def mass_extinction(self):
         for i in range(5, len(self.species)):
             self.species.remove(i)
             i -= 1
 
+    '''Unused'''
     def natural_selection(self):
         self.speciate()
         self.calculate_fitness()
