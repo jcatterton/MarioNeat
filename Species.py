@@ -1,7 +1,8 @@
 import math
 import random
 
-
+'''Genomes are grouped into species based on their genetic history, which is tracked
+by the innovation numbers attached to their genes'''
 class Species:
     def __init__(self, player):
         self.players = []
@@ -24,6 +25,7 @@ class Species:
         self.players.append(player)
 
     @staticmethod
+    '''Calculates the number of excess and disjoint genes between two genomes'''
     def get_excess_disjoint(brain_1, brain_2):
         matching = 0
         for i in range(len(brain_1.connection_genes)):
@@ -34,6 +36,7 @@ class Species:
         return len(brain_1.connection_genes) + len(brain_2.connection_genes) - 2*matching
 
     @staticmethod
+    '''Calculates the difference between two genomes'''
     def average_weight_difference(brain_1, brain_2):
         if len(brain_1.connection_genes) == 0 or len(brain_2.connection_genes) == 0:
             return 0
@@ -53,6 +56,7 @@ class Species:
 
         return total_difference/matching
 
+    '''Determine if a genome fits into a species group'''
     def same_species(self, genome):
         excess_and_disjoint = self.get_excess_disjoint(genome, self.rep)
         average_weight_difference = self.average_weight_difference(genome, self.rep)
@@ -67,6 +71,7 @@ class Species:
 
         return self.compatibility_threshold > compatibility
 
+    '''Sorts members of the species'''
     def sort_species(self):
         temp = []
         for i in range(len(self.players)):
@@ -100,6 +105,8 @@ class Species:
 
         self.average_fitness = fitness_sum/len(self.players)
 
+    '''selects a random player who is above the average fitness
+    of the species'''
     def select_player(self):
         fitness_sum = 0
         for i in range(len(self.players)):
@@ -115,6 +122,7 @@ class Species:
 
         return self.players[0]
 
+    '''Breeds two genomes in the species and returns the child'''
     def give_me_baby(self, innovation_history):
         if random.uniform(0, 1) < 0.25:
             baby = self.select_player().copy()
@@ -130,6 +138,7 @@ class Species:
         baby.brain.mutate(innovation_history)
         return baby
 
+    '''unused'''
     def cull(self):
         self.sort_species()
         if len(self.players) > 2:
@@ -137,6 +146,7 @@ class Species:
             for i in range(x):
                 del self.players[-1]
 
+    '''unused'''
     def fitness_sharing(self):
         for i in range(len(self.players)):
             self.players[i].fitness /= len(self.players)
