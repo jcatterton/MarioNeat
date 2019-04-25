@@ -1,7 +1,9 @@
 import Genome
 import time
 
-
+'''The Player class serves as an interface between the NEAT algorithm and the game environment.
+Output from the network is interpreted into input for the game, and fitness is determined which
+is used for breeding.'''
 class Player:
     def __init__(self, env):
         self.fitness = 0
@@ -30,6 +32,9 @@ class Player:
         ob = self.env.reset()
 
         '''
+        These variables are used to send a screen grab to the neural network
+        as input, however doing so caused the program to become very slow during
+        breeding.
         inx, iny, inc = self.env.observation_space.shape
 
         inx = int(inx/8)
@@ -53,6 +58,7 @@ class Player:
         while not done:
             self.env.render()
 
+            '''info refers to info.json which is used to more easily read game memory'''
             a, b, c, info = self.env.step([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
             self.x_pos = info['x']
@@ -69,6 +75,9 @@ class Player:
             counter += 1
             self.calculate_fitness()
 
+            '''If the player does not move for a certain amount of time, the run is killed.
+            This is done to end a run when a player dies and also end runs early if the player
+            is not moving at all, which is common in early genomes.'''
             if counter % 50 == 0 and counter > 0 or counter >= 500 and self.x_pos <= 150:
                 if x == self.x_pos:
                     print("Fitness: ", self.fitness)
@@ -96,18 +105,22 @@ class Player:
         copy.best_score = self.best_score
         return copy
 
+    '''Fitness is set to the distance the player managed to travel'''
     def calculate_fitness(self):
         self.fitness = self.x_pos
 
+    '''Breeds the player with another player'''
     def crossover(self, parent_2):
         child = Player()
         child.brain = self.brain.crossover(parent_2.brain)
         child.brain.generate_network()
         return child
 
+    '''gets input for the network'''
     def look(self):
         self.vision = [self.x_pos, self.y_pos, self.layer_x, self.layer_y, self.x_speed, self.y_speed]
 
+    '''gets output from the network'''
     def think(self):
         self.decision = self.brain.feed_forward(self.vision)
         self.env.step(self.decision)
