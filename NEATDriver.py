@@ -11,7 +11,11 @@ import numpy as np
 import cv2
 import retro
 
-
+'''NEATDriver is responsible for managing the NEAT algorithm, it is here that the population
+is created, and breeding occurs. After every generation, the genomes are sorted into species
+and underperforming species are culled. The champion of the population is copied into the next
+generation and the process repeats
+'''
 class NEATDriver:
     def __init__(self):
         self.next_connection_number = 1000
